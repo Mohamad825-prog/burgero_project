@@ -25,7 +25,7 @@ const App = () => {
 
       {/* Pages */}
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<HomePage openOrderModal={openOrderModal} />} />
         <Route path="/menu" element={<MenuPage />} />
         <Route path="/meals" element={<MealsPage />} />
         <Route path="/special" element={<SpecialMenuPage />} />
