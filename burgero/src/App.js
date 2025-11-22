@@ -20,8 +20,10 @@ const App = () => {
 
   return (
     <div>
+      {/* Navbar */}
       <Navbar openOrderModal={openOrderModal} />
 
+      {/* Pages */}
       <Routes>
         <Route path="/" element={<HomePage openOrderModal={openOrderModal} />} />
         <Route path="/menu" element={<MenuPage />} />
@@ -31,8 +33,11 @@ const App = () => {
         <Route path="/contact" element={<ContactPage />} />
       </Routes>
 
-      <Footer />
+      {/* Modal */}
       <OrderModal isOpen={isOrderOpen} onClose={closeOrderModal} />
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

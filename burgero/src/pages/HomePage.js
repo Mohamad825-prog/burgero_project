@@ -5,4 +5,4 @@ const HomePage = ({ openOrderModal }) => {
     return <Hero openOrderModal={openOrderModal} />;
 };
 
-export default HomePage;
+export default HomePage; 
