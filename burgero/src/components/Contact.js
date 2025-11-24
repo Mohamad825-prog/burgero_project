@@ -20,8 +20,8 @@ const Contact = () => {
             <div className="w-full md:w-2/3 bg-white rounded-xl shadow-md p-8 space-y-6">
                 <div className="space-y-2">
                     <h2 className="text-2xl font-bold text-secondary">Our Info</h2>
-                    <p>123 Burgero Street, Saida, Lebanon</p>
-                    <p>+961 70 123 456</p>
+                    <p>Near Hussameddine Rafik El Hariri Saida, Lebanon</p>
+                    <p>+961 03 299 844</p>
                     <p>info@burgero.com</p>
                 </div>
 
