@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "homepage": "https://Mohamad825-prog.github.io/burgero_project",
+  "proxy": "http://localhost:5000",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -23,7 +24,10 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "start:3005": "PORT=3005 react-scripts start",
+    "start:dev": "react-scripts start",
+    "dev": "react-scripts start"
   },
   "eslintConfig": {
     "extends": [
