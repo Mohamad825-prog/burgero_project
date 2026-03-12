@@ -1,132 +1,139 @@
-Backend API Integration Remediation — Summary
-Problem Identified
-The admin panel and user website were not properly synchronized:
+# Burgero Project
 
-User site orders/messages: Sent to backend API and saved in database ✓
-Admin orders/messages: Read from localStorage only, NOT from database ✗
-Admin menu items: Saved to localStorage only, NOT to database ✗
-User menu display: Fetches from backend API, does NOT see admin's localStorage items ✗
-This created a disconnect where:
+Full-stack burger restaurant web app with:
+- **User website** (customers browse menu, place orders, send contact messages)
+- **Admin panel** (manage orders, messages, and menu items)
+- **Backend API + Database** (single source of truth for both frontends)
 
-Orders/messages from users never appeared in the admin panel
-Menu items added by admin never appeared on the user website
-Solution Implemented
-Integrated the admin panel to use the backend API (via adminApiService) instead of localStorage for all CRUD operations.
+## Key Features
 
-Changes Made
-1. OrderManagementPage.js ✓
-File: admin-frontend/src/pages/OrderManagementPage.js
+### User Website
+- Browse menu items and special items
+- Submit orders (stored in DB via API)
+- Send contact messages (stored in DB via API)
 
-Changes:
+### Admin Panel
+- View live orders from the database
+- Update order statuses (via API)
+- Delete orders (via API)
+- View and manage contact messages (mark as read, delete, delete all)
+- Add menu items and special items (saved to DB and immediately visible on user website)
 
-Replaced dataSyncService with adminApiService
-loadOrders() now calls adminApiService.getOrders() to fetch from backend
-updateOrderStatus() now calls adminApiService.updateOrderStatus()
-deleteOrder() now calls adminApiService.deleteOrder()
-Added error handling and error display to UI
-Auto-refresh now pulls live data from database
-Result: Admin panel displays real-time orders from the database
+### Backend
+- REST API used by both the user site and admin panel
+- Persists data in MySQL database tables:
+  - `orders`
+  - `contact_messages`
+  - `menu_items`
+  - `special_items`
 
-2. ContactMessagesPage.js ✓
-File: admin-frontend/src/pages/ContactMessagesPage.js
+---
 
-Changes:
+## Important Note: Backend API Integration (Remediation Summary)
 
-Replaced dataSyncService with adminApiService
-loadMessages() now calls adminApiService.getMessages() to fetch from backend
-handleViewMessage() now calls adminApiService.markMessageAsRead()
-handleDeleteMessage() now calls adminApiService.deleteMessage()
-handleDeleteAll() now calls adminApiService.deleteAllMessages()
-handleMarkAllAsRead() loops through and marks each via API
-Fixed field name: message.read → message.is_read (to match database schema)
-Added error handling and error display to UI
-Result: Admin panel displays real-time messages from the database
+Previously, the system was not synchronized:
+- User orders/messages were saved to the database ✅
+- Admin panel was reading/writing from **localStorage only** ❌
+- Admin-added menu items didn’t appear on the user website ❌
+- User orders/messages didn’t appear in the admin panel ❌
 
-3. AddItemPage.js ✓
-File: admin-frontend/src/pages/AddItemPage.js
+### Fix Implemented
+The admin panel was updated to use the backend API (`adminApiService`) for CRUD operations instead of localStorage.
 
-Changes:
+#### Updated Admin Pages
+- `admin-frontend/src/pages/OrderManagementPage.js`
+  - Loads orders via API
+  - Updates status via API
+  - Deletes orders via API
+  - Added error handling + UI error display
+  - Auto-refresh now reflects DB state
 
-Replaced localStorage storage with backend API calls
-handleSubmit() now calls:
-adminApiService.addMenuItem() for menu items
-adminApiService.addSpecialItem() for special items
-Added form validation and error/success messages
-Added loading state during submission
-On success, redirects to home page after 2 seconds
-Fixed field name: image → image_url (to match database schema)
-Removed localStorage-based preview code
-Updated UI info box to reflect backend API integration
-Result: Menu items are saved to the database and immediately appear on the user website
+- `admin-frontend/src/pages/ContactMessagesPage.js`
+  - Loads messages via API
+  - Marks as read via API
+  - Deletes single / deletes all via API
+  - Fixed schema field: `read` → `is_read`
+  - Added error handling + UI error display
 
-4. adminApiService.js ✓
-File: admin-frontend/src/services/adminApiService.js
+- `admin-frontend/src/pages/AddItemPage.js`
+  - Adds menu/special items via API (not localStorage)
+  - Fixed schema field: `image` → `image_url`
+  - Added validation, loading state, success/error messages
+  - Redirects after successful submit
 
-New Method Added:
+- `admin-frontend/src/services/adminApiService.js`
+  - Added `deleteAllMessages()` method (calls backend `DELETE /api/messages`)
 
-async deleteAllMessages() {
-    // Calls backend DELETE /api/messages endpoint
-    // Deletes all contact messages at once
-}
-Result: ContactMessagesPage can now delete all messages via API
+✅ Result: **Real-time sync across user website + admin panel through the database**
 
-Data Flow (After Remediation)
-Orders & Messages
-User Website                 Backend                  Admin Website
-   ↓                            ↓                         ↓
-Submit Order/Message    →  Save to MySQL DB  ←  Load from DB (API)
-                        →  /api/orders (POST)
-                        →  /api/messages (POST)
-Menu Items
-Admin Website               Backend                 User Website
-   ↓                           ↓                       ↓
-Add Menu Item      →  Save to MySQL DB  ←  Fetch from DB (API)
-                   →  /api/menu/items (POST)
-                   →  /api/menu/special (POST)
-Database Tables (Already Exist)
-orders — stores customer orders
-contact_messages — stores contact form messages
-menu_items — stores menu items
-special_items — stores special menu items
-All data is now synced through the database.
+---
+
+## Architecture / Data Flow
+
+### Orders & Messages
+User Website → Backend API → MySQL DB ← Backend API ← Admin Panel
+
+### Menu Items
+Admin Panel → Backend API → MySQL DB ← Backend API ← User Website
+
+---
+
+## Tech Stack (fill in if needed)
+- Frontend (User): React (?)
+- Admin Frontend: React (?)
+- Backend: Node.js/Express (?)
+- Database: MySQL
+
+> If you tell me the exact stack, I’ll update this section precisely.
+
+---
+
+## Configuration
+
+### API Base URL
+Both admin and user apps should point to:
+
+```js
+const API_BASE_URL = 'http://localhost:5000/api';
+Ensure your backend server is running at http://localhost:5000.
+
+Run Locally (template)
+1) Backend
+bash
+cd backend
+npm install
+npm run dev
+# or: npm start
+2) Admin Frontend
+bash
+cd admin-frontend
+npm install
+npm start
+3) User Frontend
+bash
+cd user-frontend
+npm install
+npm start
+Replace folder names/commands based on your actual repo structure.
 
 Testing Checklist
- User submits order on user website → Check admin panel Order Management page sees it
- User sends message on user website → Check admin panel Contact Messages page sees it
- Admin changes order status → Status updates in database (no need to manually verify, backend validates)
- Admin deletes order → Removed from database and list
- Admin adds menu item → Item appears on user website Menu page immediately
- Admin adds special item → Item appears on user website Special Menu page immediately
- Admin deletes menu item → Removed from database (if not a default item)
-Configuration
-Backend API Base URL (both user and admin):
-
-const API_BASE_URL = 'http://localhost:5000/api';
-Ensure your backend server is running on http://localhost:5000.
-
-Benefits
-✅ Real-time sync: All data is immediately visible across both sites ✅ Single source of truth: Database is the authoritative store ✅ No localStorage pollution: Removed dependency on client-side storage for business data ✅ Scalability: Supports multiple admin/user sessions without conflicts ✅ Data persistence: All data survives page refreshes and browser restarts ✅ Security: Backend auth middleware protects admin endpoints
-
-Next Steps (Optional Enhancements)
-WebSocket updates: Implement real-time notifications when new orders/messages arrive (using Socket.io)
-Pagination: Add pagination to long lists (orders/messages)
-Search/Filter: Add advanced filtering in admin panels
-Audit logs: Track who modified what and when
-Email notifications: Send emails to admin when new orders/messages arrive
+User submits order → Admin Order Management shows it
+User sends message → Admin Contact Messages shows it
+Admin updates order status → DB updates and UI reflects it
+Admin deletes order → removed from DB + list
+Admin adds menu item → appears on user menu page immediately
+Admin adds special item → appears on user special menu page immediately
 Troubleshooting
-Issue: Admin pages show "Failed to load [orders/messages]"
-
-Solution: Ensure backend server is running on http://localhost:5000
+Admin shows “Failed to load orders/messages”
+Confirm backend is running on http://localhost:5000
 Check browser console for CORS errors
-Verify user is logged in (token in localStorage)
-Issue: Items added by admin don't appear on user website
+Verify admin auth token exists in localStorage (if your app uses JWT)
+Items added by admin don’t appear on the user website
+Hard refresh the user site (Ctrl+Shift+R)
+Check backend logs for DB insert errors
+Validation errors
+Make sure required fields are provided:
 
-Solution: User website may be caching. Hard refresh (Ctrl+Shift+R) the page
-Check backend logs for errors saving to database
-Issue: Field validation errors
-
-Solution: Ensure required fields are filled:
-Menu items: name, price required
-Special items: title, price required
-Orders: all fields required
-Messages: name, email, message required
+Menu items: name, price
+Special items: title, price
+Messages: name, email, message
