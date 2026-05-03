@@ -6,7 +6,7 @@
 
 A comprehensive admin panel for managing Burgero Restaurant operations, built with React and Tailwind CSS.
 
-## 🎯 Project Overview
+## Project Overview
 
 This admin panel provides restaurant management capabilities including:
 - Menu item management
@@ -15,7 +15,7 @@ This admin panel provides restaurant management capabilities including:
 - Contact message management
 - Restaurant analytics
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Node.js (version 14 or higher)
@@ -35,3 +35,4 @@ npm install
 
 # Start development server
 npm start
+```

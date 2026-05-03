@@ -20,40 +20,41 @@ import AddItemPage from './pages/AddItemPage';
 import EditMenuItemPage from './pages/EditMenuItemPage';
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // Check if user has a valid token
-    const checkAuth = async () => {
-      try {
-        const token = localStorage.getItem('auth_token');
+  // Skipping authentication - opening admin-frontend without login for Netlify deployment
+  // useEffect(() => {
+  //   // Check if user has a valid token
+  //   const checkAuth = async () => {
+  //     try {
+  //       const token = localStorage.getItem('auth_token');
 
-        if (!token) {
-          setIsAuthenticated(false);
-          setIsLoading(false);
-          return;
-        }
+  //       if (!token) {
+  //         setIsAuthenticated(false);
+  //         setIsLoading(false);
+  //         return;
+  //       }
 
-        // Verify token validity with backend
-        const isValid = await adminApiService.validateToken();
+  //       // Verify token validity with backend
+  //       const isValid = await adminApiService.validateToken();
 
-        if (isValid) {
-          setIsAuthenticated(true);
-        } else {
-          // Token is invalid, clear it
-          handleLogout();
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        handleLogout();
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  //       if (isValid) {
+  //         setIsAuthenticated(true);
+  //       } else {
+  //         // Token is invalid, clear it
+  //         handleLogout();
+  //       }
+  //     } catch (error) {
+  //       console.error('Auth check failed:', error);
+  //       handleLogout();
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-    checkAuth();
-  }, []);
+  //   checkAuth();
+  // }, []);
 
   const handleLogin = (token) => {
     adminApiService.setToken(token);
@@ -62,7 +63,7 @@ const App = () => {
 
   const handleLogout = () => {
     // Clear all authentication data
-    adminApiService.removeToken();
+    // adminApiService.removeToken();
     setIsAuthenticated(false);
 
     // Clear form data from localStorage if any
@@ -70,7 +71,7 @@ const App = () => {
     localStorage.removeItem('burgero_messages_fallback');
 
     // Force navigation to login
-    window.location.href = "/login";
+    // window.location.href = "/login";
   };
 
   // Show loading screen while checking auth
